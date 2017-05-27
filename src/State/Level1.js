@@ -42,7 +42,7 @@ Platformer.State.Level1.prototype = {
     ground.body.immovable = true;
 
     // Now let's create two ledges
-    let ledge = this.platforms.create(400, 400, 'platform');
+    let ledge = this.platforms.create(400, 350, 'platform');
     ledge.body.immovable = true;
 
     ledge = this.platforms.create(-150, 250, 'platform');
@@ -143,6 +143,10 @@ Platformer.State.Level1.prototype = {
   },
 
   createTimer: function () {
+    if (!this.config.timeTimit) {
+      return;
+    }
+
     let timer = this.time.create(false);
     timer.loop(1000, this.updateTimer, this);
     timer.start();

@@ -45,7 +45,7 @@ Platformer.State.Level2.prototype = {
     let ledge = this.platforms.create(400, 250, 'platform');
     ledge.body.immovable = true;
 
-    ledge = this.platforms.create(-150, 400, 'platform');
+    ledge = this.platforms.create(-150, 350, 'platform');
     ledge.body.immovable = true;
 
     // The player and its settings
@@ -138,11 +138,15 @@ Platformer.State.Level2.prototype = {
 
     if (!this.stars.countLiving()) {
       this.data.score += this.timeLeft * this.config.pointsPerSecond;
-      this.state.start('Win', true, false, this.config, this.data);
+      this.state.start('Level3', true, false, this.config, this.data);
     }
   },
 
   createTimer: function () {
+    if (!this.config.timeTimit) {
+      return;
+    }
+
     let timer = this.time.create(false);
     timer.loop(1000, this.updateTimer, this);
     timer.start();

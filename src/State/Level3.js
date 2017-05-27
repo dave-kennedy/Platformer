@@ -134,6 +134,10 @@ Platformer.State.Level3.prototype = {
   },
 
   createTimer: function () {
+    if (!this.config.timeTimit) {
+      return;
+    }
+
     let timer = this.time.create(false);
     timer.loop(1000, this.updateTimer, this);
     timer.start();

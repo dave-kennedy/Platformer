@@ -32,7 +32,8 @@ Platformer.State.Win.prototype = {
   update: function () {
     if (this.input.keyboard.isDown(Phaser.Keyboard.ENTER)) {
       this.data.score = 0;
-      this.state.start('Level1', true, false, this.config, this.data);
+      this.state.start(this.config.firstLevel, true, false, this.config,
+          this.data);
     }
   }
 };

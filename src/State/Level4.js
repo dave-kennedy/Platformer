@@ -143,11 +143,15 @@ Platformer.State.Level4.prototype = {
 
     if (!this.stars.countLiving()) {
       this.data.score += this.timeLeft * this.config.pointsPerSecond;
-      this.state.start('Level4', true, false, this.config, this.data);
+      this.state.start('Win', true, false, this.config, this.data);
     }
   },
 
   createTimer: function () {
+    if (!this.config.timeTimit) {
+      return;
+    }
+
     let timer = this.time.create(false);
     timer.loop(1000, this.updateTimer, this);
     timer.start();
