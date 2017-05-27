@@ -41,19 +41,17 @@ Platformer.State.Level4.prototype = {
     this.tilemap = this.add.tilemap('level4');
     this.tilemap.addTilesetImage('spritesheet_ground', 'spritesheet_ground');
     this.tilemap.addTilesetImage('arcade-slopes-64', 'arcade-slopes-64');
+    this.tilemap.setCollisionBetween(513, 551, true, 'Tile Layer 2');
     this.tilemapLayer1 = this.tilemap.createLayer('Tile Layer 1');
     this.tilemapLayer2 = this.tilemap.createLayer('Tile Layer 2');
+    this.tilemapLayer2.visible = false;
     this.game.slopes.convertTilemapLayer(this.tilemapLayer2, 'arcadeslopes', 513);
-
-    // Enable debugging on collision layer
-    this.tilemapLayer2.debug = true;
 
     // The player and its settings
     this.player = this.add.sprite(32, this.world.height - 150, 'dude');
 
     // We need to enable physics on the player
     this.physics.arcade.enable(this.player);
-    this.game.slopes.enable(this.player);
 
     // Player physics properties. Give the little guy a slight bounce.
     this.player.body.bounce.y = this.config.playerBounce;
@@ -69,7 +67,6 @@ Platformer.State.Level4.prototype = {
 
     // We will enable physics for any star that is created in this group
     this.stars.enableBody = true;
-    this.game.slopes.enable(this.stars);
 
     // Here we'll create 12 of them evenly spaced apart
     for (let i = 0; i < this.config.numStars; i++) {
@@ -86,6 +83,8 @@ Platformer.State.Level4.prototype = {
     // Enable arcade slopes on player and stars
     this.game.slopes.enable(this.player);
     this.game.slopes.enable(this.stars);
+    this.game.slopes.preferY = true;
+    this.player.body.slopes.pullDown = 100;
 
     // The score
     this.scoreText = this.add.text(16, 16, `Score: ${this.data.score}`, {
@@ -129,7 +128,7 @@ Platformer.State.Level4.prototype = {
     }
 
     // Allow the player to jump if they are touching the ground.
-    if (this.cursors.up.isDown && this.player.body.onFloor()) {
+    if (this.cursors.up.isDown && this.player.body.touching.down) {
       this.player.body.velocity.y = this.config.playerVelocityY * -1;
     }
   },
