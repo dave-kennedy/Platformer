@@ -40,6 +40,8 @@ Platformer.State.Level.prototype = {
   create: function () {
     this.game.plugins.add(Phaser.Plugin.ArcadeSlopes);
     this.physics.startSystem(Phaser.Physics.ARCADE);
+    this.physics.arcade.gravity.x = this.config.gravityX;
+    this.physics.arcade.gravity.y = this.config.gravityY;
     this.add.sprite(0, 0, 'sky');
     this.tilemap = this.add.tilemap(this.gameData.level);
     this.tilemapData.data.tilesets.forEach(function (tileset) {
@@ -59,7 +61,6 @@ Platformer.State.Level.prototype = {
     this.player = this.add.sprite(32, this.world.height - 150, 'dude');
     this.physics.arcade.enable(this.player);
     this.player.body.bounce.y = this.config.playerBounce;
-    this.player.body.gravity.y = this.config.playerGravity;
     this.player.body.collideWorldBounds = true;
     this.player.animations.add('left', [0, 1, 2, 3], 10, true);
     this.player.animations.add('right', [5, 6, 7, 8], 10, true);
@@ -68,7 +69,6 @@ Platformer.State.Level.prototype = {
     for (let i = 0; i < this.config.numStars; i++) {
       let star = this.stars.create(i * 70, 0, 'star');
       star.body.bounce.y = this.config.starBounceBase + Math.random() * 0.2;
-      star.body.gravity.y = this.config.starGravity;
       star.body.collideWorldBounds = true;
     }
     this.game.slopes.enable(this.player);
