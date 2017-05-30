@@ -3,13 +3,13 @@ Platformer.State = Platformer.State || {};
 
 Platformer.State.Lose = function (game) {
   this.config;
-  this.data;
+  this.gameData;
 };
 
 Platformer.State.Lose.prototype = {
-  init: function (config, data) {
+  init: function (config, gameData) {
     this.config = config;
-    this.data = data;
+    this.gameData = gameData;
   },
 
   create: function () {
@@ -18,7 +18,7 @@ Platformer.State.Lose.prototype = {
       fill: '#f00'
     });
 
-    this.add.text(310, 300, `Score: ${this.data.score}`, {
+    this.add.text(310, 300, `Score: ${this.gameData.score}`, {
       fontSize: '32px',
       fill: '#fff'
     });
@@ -31,9 +31,9 @@ Platformer.State.Lose.prototype = {
 
   update: function () {
     if (this.input.keyboard.isDown(Phaser.Keyboard.ENTER)) {
-      this.data.score = 0;
+      this.gameData.score = 0;
       this.state.start(this.config.firstLevel, true, false, this.config,
-          this.data);
+          this.gameData);
     }
   }
 };

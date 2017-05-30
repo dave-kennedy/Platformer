@@ -9,32 +9,20 @@
     <script src="lib/phaser-arcade-slopes.js"></script>
     <script src="src/Config.js"></script>
     <script src="src/GameData.js"></script>
+    <script src="src/State/Level.js"></script>
     <script src="src/State/Load.js"></script>
-    <script src="src/State/Level1.js"></script>
-    <script src="src/State/Level2.js"></script>
-    <script src="src/State/Level3.js"></script>
-    <script src="src/State/Level4.js"></script>
     <script src="src/State/Lose.js"></script>
     <script src="src/State/Win.js"></script>
     <script>
       (function () {
-        let config = new Platformer.Config({
-          firstLevel: 'Level4',
-          gameHeight: 512,
-          gameWidth: 768,
-          numStars: 11,
-          timeLimit: 0
-        });
-        let data = new Platformer.GameData();
+        let config = new Platformer.Config();
+        let gameData = new Platformer.GameData();
         let game = new Phaser.Game(config.gameWidth, config.gameHeight);
+        game.state.add('Level', Platformer.State.Level);
         game.state.add('Load', Platformer.State.Load);
-        game.state.add('Level1', Platformer.State.Level1);
-        game.state.add('Level2', Platformer.State.Level2);
-        game.state.add('Level3', Platformer.State.Level3);
-        game.state.add('Level4', Platformer.State.Level4);
         game.state.add('Lose', Platformer.State.Lose);
         game.state.add('Win', Platformer.State.Win);
-        game.state.start('Load', true, false, config, data);
+        game.state.start('Load', true, false, config, gameData);
       }());
     </script>
   </body>
