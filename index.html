@@ -11,8 +11,6 @@
     <script src="src/GameData.js"></script>
     <script src="src/State/Level.js"></script>
     <script src="src/State/Load.js"></script>
-    <script src="src/State/Lose.js"></script>
-    <script src="src/State/Win.js"></script>
     <script>
       (function () {
         let config = new Platformer.Config();
@@ -20,8 +18,6 @@
         let game = new Phaser.Game(config.gameWidth, config.gameHeight);
         game.state.add('Level', Platformer.State.Level);
         game.state.add('Load', Platformer.State.Load);
-        game.state.add('Lose', Platformer.State.Lose);
-        game.state.add('Win', Platformer.State.Win);
         game.state.start('Load', true, false, config, gameData);
       }());
     </script>

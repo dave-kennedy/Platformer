@@ -5,6 +5,5 @@ Platformer.GameData = function (params) {
 
   this.level = params.level || 'level1';
   this.name = params.name || 'Player';
-  this.score = params.score || 0;
 };
 

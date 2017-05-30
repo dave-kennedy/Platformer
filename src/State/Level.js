@@ -6,6 +6,7 @@ Platformer.State.Level = function (game) {
   this.config;
   this.cursors;
   this.gameData;
+  this.gameOver;
   this.player;
   this.stars;
   this.tilemap;
@@ -23,6 +24,17 @@ Platformer.State.Level.prototype = {
     this.load.tilemap(this.gameData.level,
         `assets/levels/${this.gameData.level}.json`, null,
         Phaser.Tilemap.TILED_JSON);
+  },
+
+  fileComplete: function (progress, key, success) {
+    if (key != this.gameData.level || progress != 100 || !success) {
+      return;
+    }
+    this.tilemapData = this.cache.getTilemapData(this.gameData.level);
+    this.tilemapData.data.tilesets.forEach(function (tileset) {
+      let url = tileset.image.replace('..', 'assets');
+      this.load.image(tileset.name, url);
+    }, this);
   },
 
   create: function () {
@@ -55,8 +67,9 @@ Platformer.State.Level.prototype = {
     this.stars.enableBody = true;
     for (let i = 0; i < this.config.numStars; i++) {
       let star = this.stars.create(i * 70, 0, 'star');
-      star.body.gravity.y = this.config.starGravity;
       star.body.bounce.y = this.config.starBounceBase + Math.random() * 0.2;
+      star.body.gravity.y = this.config.starGravity;
+      star.body.collideWorldBounds = true;
     }
     this.game.slopes.enable(this.player);
     this.game.slopes.enable(this.stars);
@@ -84,17 +97,9 @@ Platformer.State.Level.prototype = {
     if (this.cursors.up.isDown && this.player.body.touching.down) {
       this.player.body.velocity.y = this.config.playerVelocityY * -1;
     }
-  },
-
-  fileComplete: function (progress, key, success) {
-    if (key != this.gameData.level || progress != 100 || !success) {
-      return;
+    if (this.gameOver && this.input.keyboard.isDown(Phaser.Keyboard.ENTER)) {
+      this.restart();
     }
-    this.tilemapData = this.cache.getTilemapData(this.gameData.level);
-    this.tilemapData.data.tilesets.forEach(function (tileset) {
-      let url = tileset.image.replace('..', 'assets');
-      this.load.image(tileset.name, url);
-    }, this);
   },
 
   collectStar: function (player, star) {
@@ -102,12 +107,33 @@ Platformer.State.Level.prototype = {
     if (this.stars.countLiving()) {
       return;
     }
+    this.nextLevel();
+  },
+
+  nextLevel: function () {
     let nextLevel = this.config.levels.indexOf(this.gameData.level) + 1;
     if (nextLevel > this.config.levels.length - 1) {
-      this.state.start('Win', true, false, this.config, this.gameData);
+      this.gameOver = true;
+      this.showGameOver();
       return;
     }
     this.gameData.level = this.config.levels[nextLevel];
+    this.state.restart(true, false, this.config, this.gameData);
+  },
+
+  showGameOver: function () {
+    this.add.text(318, 200, 'You win!', {
+      fontSize: '32px',
+      fill: '#f00'
+    });
+    this.add.text(264, 240, 'Press enter to restart', {
+      fontSize: '24px',
+      fill: '#fff'
+    });
+  },
+
+  restart: function () {
+    this.gameData.level = this.config.levels[0];
     this.state.restart(true, false, this.config, this.gameData);
   }
 };

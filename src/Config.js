@@ -11,10 +11,7 @@ Platformer.Config = function (params) {
   this.playerGravity = params.playerGravity || 300;
   this.playerVelocityX = params.playerVelocityX || 150;
   this.playerVelocityY = params.playerVelocityY || 300;
-  this.pointsPerSecond = params.pointsPerSecond || 10;
-  this.pointsPerStar = params.pointsPerStar || 10;
   this.starBounceBase = params.starBounceBase || 0.5;
   this.starGravity = params.starGravity || 300;
-  this.timeLimit = params.timeLimit || 0;
 };
 
