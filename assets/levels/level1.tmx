@@ -6,6 +6,9 @@
  <tileset firstgid="52" name="spritesheet_ground" tilewidth="64" tileheight="64" tilecount="512" columns="16">
   <image source="../spritesheet_ground.png" width="1024" height="2048"/>
  </tileset>
+ <imagelayer name="background">
+  <image source="../background.png" width="768" height="512"/>
+ </imagelayer>
  <layer name="ground" width="12" height="8">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,

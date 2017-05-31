@@ -31,10 +31,19 @@ Platformer.State.Level.prototype = {
       return;
     }
     this.tilemapData = this.cache.getTilemapData(this.gameData.level);
-    this.tilemapData.data.tilesets.forEach(function (tileset) {
-      let url = tileset.image.replace('..', 'assets');
-      this.load.image(tileset.name, url);
+    this.tilemapData.data.layers.forEach(function (layer) {
+      if (layer.type == 'imagelayer') {
+        this.loadImageAsset(layer.name, layer.image);
+      }
     }, this);
+    this.tilemapData.data.tilesets.forEach(function (tileset) {
+      this.loadImageAsset(tileset.name, tileset.image);
+    }, this);
+  },
+
+  loadImageAsset: function (key, path) {
+    let url = path.replace('..', 'assets');
+    this.load.image(key, url);
   },
 
   create: function () {
@@ -42,20 +51,17 @@ Platformer.State.Level.prototype = {
     this.physics.startSystem(Phaser.Physics.ARCADE);
     this.physics.arcade.gravity.x = this.config.gravityX;
     this.physics.arcade.gravity.y = this.config.gravityY;
-    this.add.sprite(0, 0, 'sky');
     this.tilemap = this.add.tilemap(this.gameData.level);
     this.tilemapData.data.tilesets.forEach(function (tileset) {
       this.tilemap.addTilesetImage(tileset.name, tileset.name);
     }, this);
     this.tilemapData.data.layers.forEach(function (layer) {
-      let tilemapLayer = this.tilemap.createLayer(layer.name);
-      if (layer.properties && layer.properties.collides) {
-        this.collisionLayer = tilemapLayer;
-        this.game.slopes.convertTilemapLayer(tilemapLayer, 'arcadeslopes');
-        this.tilemap.setCollision(layer.data, true, tilemapLayer);
+      if (layer.type == 'imagelayer') {
+        this.add.sprite(layer.x, layer.y, layer.name);
+        return;
       }
-      if (!layer.visible) {
-        tilemapLayer.visible = false;
+      if (layer.type == 'tilelayer') {
+        this.createTilemapLayer(layer);
       }
     }, this);
     this.player = this.add.sprite(32, this.world.height - 150, 'dude');
@@ -76,6 +82,18 @@ Platformer.State.Level.prototype = {
     this.game.slopes.preferY = true;
     this.player.body.slopes.pullDown = 100;
     this.cursors = this.input.keyboard.createCursorKeys();
+  },
+
+  createTilemapLayer: function (layer) {
+    let tilemapLayer = this.tilemap.createLayer(layer.name);
+    if (layer.properties && layer.properties.collides) {
+      this.collisionLayer = tilemapLayer;
+      this.game.slopes.convertTilemapLayer(tilemapLayer, 'arcadeslopes');
+      this.tilemap.setCollision(layer.data, true, tilemapLayer);
+    }
+    if (!layer.visible) {
+      tilemapLayer.visible = false;
+    }
   },
 
   update: function () {
