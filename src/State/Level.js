@@ -51,6 +51,18 @@ Platformer.State.Level.prototype = {
     this.physics.startSystem(Phaser.Physics.ARCADE);
     this.physics.arcade.gravity.x = this.config.gravityX;
     this.physics.arcade.gravity.y = this.config.gravityY;
+    this.createTilemap();
+    this.createPlayer();
+    this.createStars();
+    this.game.slopes.enable(this.player);
+    this.game.slopes.enable(this.stars);
+    this.game.slopes.preferY = true;
+    this.player.body.slopes.pullDown = 100;
+    this.camera.follow(this.player);
+    this.cursors = this.input.keyboard.createCursorKeys();
+  },
+
+  createTilemap: function () {
     this.tilemap = this.add.tilemap(this.gameData.level);
     this.tilemapData.data.tilesets.forEach(function (tileset) {
       this.tilemap.addTilesetImage(tileset.name, tileset.name);
@@ -64,28 +76,11 @@ Platformer.State.Level.prototype = {
         this.createTilemapLayer(layer);
       }
     }, this);
-    this.player = this.add.sprite(32, this.world.height - 150, 'dude');
-    this.physics.arcade.enable(this.player);
-    this.player.body.bounce.y = this.config.playerBounce;
-    this.player.body.collideWorldBounds = true;
-    this.player.animations.add('left', [0, 1, 2, 3], 10, true);
-    this.player.animations.add('right', [5, 6, 7, 8], 10, true);
-    this.stars = this.add.group();
-    this.stars.enableBody = true;
-    for (let i = 0; i < this.config.numStars; i++) {
-      let star = this.stars.create(i * 70, 0, 'star');
-      star.body.bounce.y = this.config.starBounceBase + Math.random() * 0.2;
-      star.body.collideWorldBounds = true;
-    }
-    this.game.slopes.enable(this.player);
-    this.game.slopes.enable(this.stars);
-    this.game.slopes.preferY = true;
-    this.player.body.slopes.pullDown = 100;
-    this.cursors = this.input.keyboard.createCursorKeys();
   },
 
   createTilemapLayer: function (layer) {
     let tilemapLayer = this.tilemap.createLayer(layer.name);
+    tilemapLayer.resizeWorld();
     if (layer.properties && layer.properties.collides) {
       this.collisionLayer = tilemapLayer;
       this.game.slopes.convertTilemapLayer(tilemapLayer, 'arcadeslopes');
@@ -94,6 +89,32 @@ Platformer.State.Level.prototype = {
     if (!layer.visible) {
       tilemapLayer.visible = false;
     }
+  },
+
+  createPlayer: function () {
+    this.player = this.add.sprite(this.config.playerStartX,
+        this.config.playerStartY, 'dude');
+    this.physics.arcade.enable(this.player);
+    this.player.body.bounce.y = this.config.playerBounce;
+    this.player.body.collideWorldBounds = true;
+    this.player.animations.add('left', [0, 1, 2, 3], 10, true);
+    this.player.animations.add('right', [5, 6, 7, 8], 10, true);
+  },
+
+  createStars: function () {
+    this.stars = this.add.group();
+    this.stars.enableBody = true;
+    for (let i = 0; i < this.config.numStars; i++) {
+      let x = this.randomNumber(0, this.world.width);
+      let star = this.stars.create(x, 0, 'star');
+      star.body.bounce.y = this.config.starBounceBase + Math.random() * 0.2;
+      star.body.collideWorldBounds = true;
+    }
+  },
+
+  // returns a random number between min (inclusive) and max (inclusive)
+  randomNumber: function (min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
   },
 
   update: function () {
@@ -112,12 +133,16 @@ Platformer.State.Level.prototype = {
       this.player.animations.stop();
       this.player.frame = 4;
     }
-    if (this.cursors.up.isDown && this.player.body.touching.down) {
+    if (this.cursors.up.isDown && this.canJump()) {
       this.player.body.velocity.y = this.config.playerVelocityY * -1;
     }
     if (this.gameOver && this.input.keyboard.isDown(Phaser.Keyboard.ENTER)) {
       this.restart();
     }
+  },
+
+  canJump: function () {
+    return this.player.body.onFloor() || this.player.body.touching.down;
   },
 
   collectStar: function (player, star) {
@@ -139,6 +164,11 @@ Platformer.State.Level.prototype = {
     this.state.restart(true, false, this.config, this.gameData);
   },
 
+  restart: function () {
+    this.gameData.level = this.config.levels[0];
+    this.state.restart(true, false, this.config, this.gameData);
+  },
+
   showGameOver: function () {
     this.add.text(318, 200, 'You win!', {
       fontSize: '32px',
@@ -148,11 +178,6 @@ Platformer.State.Level.prototype = {
       fontSize: '24px',
       fill: '#fff'
     });
-  },
-
-  restart: function () {
-    this.gameData.level = this.config.levels[0];
-    this.state.restart(true, false, this.config, this.gameData);
   }
 };
 
